@@ -643,7 +643,7 @@ export default function App() {
         {/* Preview */}
         <section className="flex-1 bg-slate-100/50 p-10 overflow-y-auto flex flex-col items-center print:bg-white print:p-0 print:overflow-visible">
           <div className="mb-4 bg-white px-4 py-2 rounded-full border border-slate-200 flex items-center gap-2 text-xs font-bold text-slate-500 shadow-sm print:hidden">
-            <Eye size={14} className="text-blue-600" /> VISUALIZAÇÃO EM TEMPO REAL
+            <Eye size={14} className="text-blue-600" /> LAYOUT DE PÁGINA — A4
           </div>
           <ContractPreview refToUse={printRef} />
         </section>
