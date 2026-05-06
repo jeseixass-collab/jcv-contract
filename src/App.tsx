@@ -20,12 +20,6 @@ import {
   Users,
   History,
   AlertCircle,
-  Sparkles,
-  ChevronRight,
-  ChevronLeft,
-  MessageSquare,
-  ScanText,
-  ShieldCheck,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { extenso, extensoSimples } from './utils/numberToWords';
@@ -126,292 +120,6 @@ const maskCpf = (v: string) => v.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$
 const maskPhone = (v: string) => v.replace(/\D/g, '').replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2').replace(/(-\d{4})\d+?$/, '$1');
 const maskCep = (v: string) => v.replace(/\D/g, '').replace(/(\d{5})(\d)/, '$1-$2').replace(/(-\d{3})\d+?$/, '$1');
 
-const API_URL = 'https://api.anthropic.com/v1/messages';
-const MODEL = 'claude-sonnet-4-20250514';
-
-async function callClaude(systemPrompt: string, messages: { role: string; content: string }[]): Promise<string> {
-  const resp = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: MODEL, max_tokens: 1000, system: systemPrompt, messages }),
-  });
-  const data = await resp.json();
-  return data.content?.[0]?.text || '';
-}
-
-// ─── AI Panel Component ───────────────────────────────────────────────────────
-
-function AiPanel({ data, onApplyContratante }: { data: ContractData; onApplyContratante: (fields: Partial<Contratante>, index: number) => void }) {
-  const [activeTab, setActiveTab] = useState<'extrator' | 'analise' | 'chat'>('extrator');
-  const [rawText, setRawText] = useState('');
-  const [extracting, setExtracting] = useState(false);
-  const [extracted, setExtracted] = useState<Partial<Contratante> | null>(null);
-  const [extractObs, setExtractObs] = useState('');
-  const [analyzing, setAnalyzing] = useState(false);
-  const [analysisItems, setAnalysisItems] = useState<AnalysisItem[] | null>(null);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    { role: 'ai', content: 'Olá! Posso tirar dúvidas sobre preenchimento, cláusulas ou condições do contrato. O que precisa?' },
-  ]);
-  const [chatInput, setChatInput] = useState('');
-  const [chatLoading, setChatLoading] = useState(false);
-  const [targetContratante, setTargetContratante] = useState(0);
-  const chatEndRef = useRef<HTMLDivElement>(null);
-
-  const fieldLabels: Record<string, string> = {
-    nome: 'Nome', nacionalidade: 'Nacionalidade', estadoCivil: 'Estado civil',
-    profissao: 'Profissão', cpf: 'CPF', email: 'Email', telefone: 'Telefone',
-    rua: 'Logradouro', numero: 'Número', bairro: 'Bairro', cidade: 'Cidade', estado: 'Estado', cep: 'CEP',
-  };
-
-  async function handleExtract() {
-    if (!rawText.trim()) return;
-    setExtracting(true);
-    setExtracted(null);
-    try {
-      const system = `Você é um extrator de dados para contratos brasileiros. Extraia os campos abaixo e retorne APENAS JSON válido, sem texto fora do JSON. Se um campo não for encontrado, use string vazia "". Campos: nome, nacionalidade, estadoCivil, profissao, cpf, email, telefone, rua, numero, bairro, cidade, estado, cep.`;
-      const raw = await callClaude(system, [{ role: 'user', content: rawText }]);
-      const clean = raw.replace(/```json|```/g, '').trim();
-      const parsed: Partial<Contratante> = JSON.parse(clean);
-      setExtracted(parsed);
-      const missing = Object.entries(parsed).filter(([, v]) => !v).map(([k]) => fieldLabels[k] || k);
-      setExtractObs(missing.length ? `Não encontrado: ${missing.join(', ')}.` : 'Todos os campos identificados.');
-    } catch {
-      setExtractObs('Erro ao processar. Tente novamente.');
-    }
-    setExtracting(false);
-  }
-
-  function handleApply() {
-    if (!extracted) return;
-    onApplyContratante(extracted, targetContratante);
-    setExtractObs('✓ Dados aplicados ao contratante ' + (targetContratante + 1) + '!');
-  }
-
-  async function handleAnalyze() {
-    setAnalyzing(true);
-    setAnalysisItems(null);
-    const saldo = data.valorTotal - data.valorEntrada;
-    const parcela = data.numParcelas > 0 ? (saldo / data.numParcelas).toFixed(2) : 'indefinido';
-    const bonus = data.selectedBonuses.map(id => AVAILABLE_BONUSES.find(b => b.id === id)?.title).filter(Boolean).join(', ');
-    const system = `Você é um assistente jurídico especialista em contratos de mentoria brasileiros. Analise os dados e retorne APENAS JSON: {"erros":[{"tipo":"erro|aviso|ok","mensagem":"..."}]}. Verifique: entrada maior que total, saldo sem parcelas, valores zerados, duração incomum para o valor, nome ausente. Seja objetivo em português.`;
-    const msg = `nome="${data.contratantes[0]?.nome || 'não informado'}", valorTotal=${data.valorTotal}, valorEntrada=${data.valorEntrada}, saldo=${saldo}, parcelas=${data.numParcelas}, valorParcela=${parcela}, duracaoMentoria=${data.duracaoMentoria}meses, duracaoAulas=${data.duracaoAulas}meses, bonus="${bonus || 'nenhum'}"`;
-    try {
-      const raw = await callClaude(system, [{ role: 'user', content: msg }]);
-      const clean = raw.replace(/```json|```/g, '').trim();
-      const result = JSON.parse(clean);
-      setAnalysisItems(result.erros || []);
-    } catch {
-      setAnalysisItems([{ tipo: 'erro', mensagem: 'Erro ao analisar. Tente novamente.' }]);
-    }
-    setAnalyzing(false);
-  }
-
-  async function handleChat() {
-    const msg = chatInput.trim();
-    if (!msg || chatLoading) return;
-    setChatInput('');
-    const newMessages: ChatMessage[] = [...chatMessages, { role: 'user', content: msg }];
-    setChatMessages(newMessages);
-    setChatLoading(true);
-    const system = `Você é o assistente do sistema JCV Contract, especializado no contrato "MENTORIA AUTORIZADO" da JCV Academy LTDA. Responda dúvidas sobre cláusulas, valores, bônus, rescisão, LGPD, não concorrência e preenchimento. Seja direto e objetivo em português. Máximo 3 parágrafos.`;
-    const apiMessages = newMessages.map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.content }));
-    try {
-      const reply = await callClaude(system, apiMessages);
-      setChatMessages([...newMessages, { role: 'ai', content: reply }]);
-    } catch {
-      setChatMessages([...newMessages, { role: 'ai', content: 'Erro ao conectar. Tente novamente.' }]);
-    }
-    setChatLoading(false);
-    setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-  }
-
-  const tabs = [
-    { key: 'extrator', label: 'Extrair dados', icon: <ScanText size={13} /> },
-    { key: 'analise', label: 'Análise', icon: <ShieldCheck size={13} /> },
-    { key: 'chat', label: 'Assistente', icon: <MessageSquare size={13} /> },
-  ] as const;
-
-  return (
-    <div className="flex flex-col h-full bg-white border-l border-slate-200">
-      {/* Header */}
-      <div className="flex-none px-4 pt-4 pb-3 border-b border-slate-100">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-6 h-6 rounded-lg bg-violet-100 flex items-center justify-center">
-            <Sparkles size={13} className="text-violet-600" />
-          </div>
-          <span className="text-sm font-bold text-slate-700">Assistente IA</span>
-          <span className="ml-auto px-1.5 py-0.5 bg-violet-50 text-violet-600 text-[9pt] font-bold rounded">Claude</span>
-        </div>
-        <div className="flex gap-1">
-          {tabs.map(t => (
-            <button
-              key={t.key}
-              onClick={() => setActiveTab(t.key)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10pt] font-semibold transition-all ${activeTab === t.key ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'}`}
-            >
-              {t.icon} {t.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4">
-
-        {/* ── EXTRATOR ── */}
-        {activeTab === 'extrator' && (
-          <div className="space-y-3">
-            <p className="text-[11pt] text-slate-500 leading-relaxed">Cole qualquer texto com os dados do contratante. A IA extrai os campos automaticamente.</p>
-            <textarea
-              value={rawText}
-              onChange={e => setRawText(e.target.value)}
-              placeholder="Ex: João da Silva, CPF 123.456.789-00, solteiro, engenheiro. Rua das Flores 42, Centro, Florianópolis/SC. joao@email.com (48) 99999-0000."
-              className="w-full h-28 px-3 py-2.5 text-[11pt] border border-slate-200 rounded-xl resize-none outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-50 transition-all"
-            />
-            {data.contratantes.length > 1 && (
-              <div className="flex items-center gap-2">
-                <span className="text-[10pt] text-slate-500">Aplicar ao contratante:</span>
-                <select
-                  value={targetContratante}
-                  onChange={e => setTargetContratante(parseInt(e.target.value))}
-                  className="px-2 py-1 border border-slate-200 rounded-lg text-[10pt] outline-none"
-                >
-                  {data.contratantes.map((c, i) => (
-                    <option key={c.id} value={i}>{c.nome || `Contratante ${i + 1}`}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-            <button
-              onClick={handleExtract}
-              disabled={extracting || !rawText.trim()}
-              className="w-full py-2.5 bg-violet-600 text-white rounded-xl text-[11pt] font-bold hover:bg-violet-700 disabled:opacity-40 transition-all flex items-center justify-center gap-2"
-            >
-              {extracting ? (
-                <><span className="animate-spin">⟳</span> Extraindo...</>
-              ) : (
-                <><ScanText size={14} /> Extrair dados</>
-              )}
-            </button>
-
-            {extracted && (
-              <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-1.5">
-                  {Object.entries(extracted).map(([k, v]) => (
-                    k !== 'id' && (
-                      <div key={k} className={`px-2.5 py-2 rounded-lg border text-[10pt] ${v ? 'border-slate-100 bg-slate-50' : 'border-red-100 bg-red-50'}`}>
-                        <div className="text-[8.5pt] text-slate-400 uppercase tracking-wider mb-0.5">{fieldLabels[k] || k}</div>
-                        <div className={`font-semibold truncate ${v ? 'text-slate-700' : 'text-red-400 italic'}`}>{v || 'não encontrado'}</div>
-                      </div>
-                    )
-                  ))}
-                </div>
-                {extractObs && (
-                  <p className={`text-[10pt] ${extractObs.startsWith('✓') ? 'text-emerald-600' : extractObs.startsWith('Não') ? 'text-amber-600' : 'text-slate-500'}`}>{extractObs}</p>
-                )}
-                <button
-                  onClick={handleApply}
-                  className="w-full py-2 bg-emerald-600 text-white rounded-xl text-[11pt] font-bold hover:bg-emerald-700 transition-all flex items-center justify-center gap-2"
-                >
-                  <CheckCircle size={14} /> Aplicar ao formulário
-                </button>
-              </div>
-            )}
-            {!extracted && extractObs && (
-              <p className="text-[10pt] text-red-500">{extractObs}</p>
-            )}
-          </div>
-        )}
-
-        {/* ── ANÁLISE ── */}
-        {activeTab === 'analise' && (
-          <div className="space-y-3">
-            <p className="text-[11pt] text-slate-500 leading-relaxed">A IA analisa os dados atuais do contrato e aponta erros, avisos e confirmações.</p>
-            <div className="bg-slate-50 rounded-xl border border-slate-100 p-3 space-y-2 text-[10pt]">
-              <div className="flex justify-between text-slate-600"><span>Valor total</span><span className="font-bold text-slate-800">{data.valorTotal > 0 ? `R$ ${data.valorTotal.toLocaleString('pt-BR')}` : '—'}</span></div>
-              <div className="flex justify-between text-slate-600"><span>Entrada</span><span className="font-bold text-slate-800">{data.valorEntrada > 0 ? `R$ ${data.valorEntrada.toLocaleString('pt-BR')}` : '—'}</span></div>
-              <div className="flex justify-between text-slate-600"><span>Saldo / parcelas</span><span className="font-bold text-slate-800">R$ {(data.valorTotal - data.valorEntrada).toLocaleString('pt-BR')} / {data.numParcelas}x</span></div>
-              <div className="flex justify-between text-slate-600"><span>Duração mentoria</span><span className="font-bold text-slate-800">{data.duracaoMentoria} meses</span></div>
-              <div className="flex justify-between text-slate-600"><span>Contratante</span><span className="font-bold text-slate-800 truncate max-w-[130px]">{data.contratantes[0]?.nome || '—'}</span></div>
-            </div>
-            <button
-              onClick={handleAnalyze}
-              disabled={analyzing}
-              className="w-full py-2.5 bg-violet-600 text-white rounded-xl text-[11pt] font-bold hover:bg-violet-700 disabled:opacity-40 transition-all flex items-center justify-center gap-2"
-            >
-              {analyzing ? <><span className="animate-spin">⟳</span> Analisando...</> : <><ShieldCheck size={14} /> Analisar agora</>}
-            </button>
-
-            {analysisItems && (
-              <div className="space-y-2">
-                {analysisItems.length === 0 && (
-                  <div className="flex gap-2 p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
-                    <CheckCircle size={15} className="text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-[11pt] text-emerald-700">Nenhum problema encontrado.</span>
-                  </div>
-                )}
-                {analysisItems.map((item, i) => (
-                  <div key={i} className={`flex gap-2 p-3 rounded-xl border text-[11pt] ${item.tipo === 'erro' ? 'bg-red-50 border-red-100 text-red-700' : item.tipo === 'aviso' ? 'bg-amber-50 border-amber-100 text-amber-700' : 'bg-emerald-50 border-emerald-100 text-emerald-700'}`}>
-                    {item.tipo === 'erro' ? <AlertCircle size={15} className="flex-shrink-0 mt-0.5" /> : item.tipo === 'aviso' ? <AlertCircle size={15} className="flex-shrink-0 mt-0.5" /> : <CheckCircle size={15} className="flex-shrink-0 mt-0.5" />}
-                    <span className="leading-snug">{item.mensagem}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── CHAT ── */}
-        {activeTab === 'chat' && (
-          <div className="space-y-3 flex flex-col h-full">
-            <div className="flex-1 space-y-2 max-h-[380px] overflow-y-auto pr-1">
-              {chatMessages.map((m, i) => (
-                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[88%] px-3 py-2 rounded-xl text-[11pt] leading-relaxed ${m.role === 'user' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
-                    {m.content}
-                  </div>
-                </div>
-              ))}
-              {chatLoading && (
-                <div className="flex justify-start">
-                  <div className="px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl flex gap-1 items-center">
-                    {[0, 1, 2].map(i => <span key={i} className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: `${i * 150}ms` }} />)}
-                  </div>
-                </div>
-              )}
-              <div ref={chatEndRef} />
-            </div>
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {['Cláusula de não concorrência', 'Direito de arrependimento', 'Multa por rescisão'].map(q => (
-                <button key={q} onClick={() => { setChatInput(q); }} className="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[9.5pt] text-slate-500 hover:border-violet-300 hover:text-violet-600 transition-all">
-                  {q}
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={chatInput}
-                onChange={e => setChatInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleChat()}
-                placeholder="Tire sua dúvida..."
-                className="flex-1 px-3 py-2 text-[11pt] border border-slate-200 rounded-xl outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-50 transition-all"
-              />
-              <button
-                onClick={handleChat}
-                disabled={chatLoading || !chatInput.trim()}
-                className="px-3 py-2 bg-violet-600 text-white rounded-xl hover:bg-violet-700 disabled:opacity-40 transition-all"
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 
 // ─── Login Screen ─────────────────────────────────────────────────────────────
 
@@ -504,7 +212,6 @@ export default function App() {
 
   const [loadingCep, setLoadingCep] = useState<string | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
-  const [aiPanelOpen, setAiPanelOpen] = useState(true);
 
   React.useEffect(() => { localStorage.setItem('jcv-contract-draft', JSON.stringify(data)); }, [data]);
   React.useEffect(() => { localStorage.setItem('jcv-contract-history', JSON.stringify(history)); }, [history]);
@@ -527,17 +234,6 @@ export default function App() {
     if (field === 'cep') v = maskCep(value);
     setData(prev => ({ ...prev, contratantes: prev.contratantes.map(c => c.id === id ? { ...c, [field]: v } : c) }));
     if (field === 'cep' && v.length === 9) fetchCep(id, v.replace('-', ''));
-  };
-
-  // Apply extracted AI data to a contratante
-  const handleApplyContratante = (fields: Partial<Contratante>, index: number) => {
-    setData(prev => {
-      const updated = [...prev.contratantes];
-      if (updated[index]) {
-        updated[index] = { ...updated[index], ...fields };
-      }
-      return { ...prev, contratantes: updated };
-    });
   };
 
   const fetchCep = async (contratanteId: string, cep: string) => {
@@ -764,16 +460,6 @@ export default function App() {
           >
             <History size={20} />
           </button>
-          {/* AI Panel Toggle */}
-          <button
-            onClick={() => setAiPanelOpen(v => !v)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all border ${aiPanelOpen ? 'bg-violet-50 border-violet-200 text-violet-700' : 'bg-white border-slate-200 text-slate-500 hover:border-violet-200 hover:text-violet-600'}`}
-            title="Assistente IA"
-          >
-            <Sparkles size={15} />
-            <span className="hidden sm:inline">IA</span>
-            {aiPanelOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
-          </button>
           <button onClick={downloadPdf} className="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-semibold hover:bg-slate-900 transition-all flex items-center gap-2 active:scale-95 shadow-sm">
             <Download size={16} /> Exportar PDF
           </button>
@@ -954,24 +640,6 @@ export default function App() {
             </div>
           </div>
         </section>
-
-        {/* AI Panel — slides in/out */}
-        <AnimatePresence>
-          {aiPanelOpen && (
-            <motion.section
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 320, opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="flex-none overflow-hidden print:hidden"
-              style={{ minWidth: 0 }}
-            >
-              <div className="w-80 h-full">
-                <AiPanel data={data} onApplyContratante={handleApplyContratante} />
-              </div>
-            </motion.section>
-          )}
-        </AnimatePresence>
 
         {/* Preview */}
         <section className="flex-1 bg-slate-100/50 p-10 overflow-y-auto flex flex-col items-center print:bg-white print:p-0 print:overflow-visible">
