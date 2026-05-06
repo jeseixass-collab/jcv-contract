@@ -533,7 +533,7 @@ export default function App() {
       ref={refToUse}
       className={`bg-white w-full ${isPrint ? 'max-w-none' : 'max-w-[210mm] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-doc-border min-h-[297mm]'} p-[10mm] md:p-[20mm] text-[11pt] leading-snug text-doc-text font-serif print:shadow-none print:border-none print:p-0 ${isPrint ? '' : 'mx-auto'}`}
     >
-      <div className="hidden print:block fixed bottom-0 right-0 text-[9pt] text-doc-light font-sans pointer-events-none [counter-increment:page] pr-4 pb-4">Pág. <span className="after:content-[counter(page)]"></span></div>
+
       <div className="flex justify-between items-start mb-4 border-b border-doc-divider pb-2 pdf-page-break-avoid">
         <div className="text-[9pt] text-doc-muted font-sans space-y-0"><p>91 98156-6037 • robertomaues@gmail.com</p><p>Rua Municipalidade, n. 985, Sala 1108, Belém/PA</p></div>
         <div className="text-right font-sans"><div className="italic text-base font-bold tracking-tighter text-doc-text leading-none">MAUÉS</div><div className="text-[7pt] uppercase tracking-[0.2em] font-bold text-doc-light">Advogados Associados</div></div>
