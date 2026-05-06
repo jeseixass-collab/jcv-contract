@@ -661,6 +661,20 @@ export default function App() {
               </div>
             ))}
           </div>
+          <div className="flex gap-16 mt-8">
+            <div className="flex flex-col items-start flex-1">
+              <div className="w-full border-t border-doc-border border-dashed" />
+              <p className="font-bold text-[11pt] mt-2 text-doc-text">TESTEMUNHA 1</p>
+              <p className="text-[10pt] text-doc-muted font-sans mt-1">Nome: ___________________________________</p>
+              <p className="text-[10pt] text-doc-muted font-sans mt-1">CPF: ____________________________________</p>
+            </div>
+            <div className="flex flex-col items-start flex-1">
+              <div className="w-full border-t border-doc-border border-dashed" />
+              <p className="font-bold text-[11pt] mt-2 text-doc-text">TESTEMUNHA 2</p>
+              <p className="text-[10pt] text-doc-muted font-sans mt-1">Nome: ___________________________________</p>
+              <p className="text-[10pt] text-doc-muted font-sans mt-1">CPF: ____________________________________</p>
+            </div>
+          </div>
           <div className="text-[9pt] text-doc-light font-sans text-center mt-12 italic border-t border-doc-divider pt-4">E, por estarem justas e acostadas, as partes assinam o presente instrumento na forma digital, nos termos regulamentados pelo Decreto n° 10.543 de 13/11/2020.</div>
         </div>
       </div>
