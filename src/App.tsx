@@ -417,7 +417,6 @@ export default function App() {
   // ─── COMPRA E VENDA PREVIEW ──────────────────────────────────────────────────
   const CompraVendaPreview = ({ isPrint = false, refToUse = null }: { isPrint?: boolean; refToUse?: React.RefObject<HTMLDivElement | null> | null }) => {
     const c = data.contratantes[0];
-    const hl = (val: string, placeholder: string) => val ? <>{val}</> : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">{placeholder}</span>;
     return (
     <div ref={refToUse} style={{position:'relative'}} className={`bg-white w-full ${isPrint ? 'max-w-none' : 'max-w-[210mm] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-doc-border'} p-[10mm] md:p-[20mm] text-[11pt] leading-snug text-doc-text font-serif print:shadow-none print:border-none print:p-0 ${isPrint ? '' : 'mx-auto'}`}>
       <WatermarkLogo />
@@ -431,51 +430,57 @@ export default function App() {
         <Clause title="1. OBJETO DO CONTRATO" />
         <p>1.1 O presente contrato tem como objeto a venda de um aparelho celular fornecido pela VENDEDORA, podendo ser novo ou seminovo, ao(a) COMPRADOR(A).</p>
         <Clause title="2. CARACTERÍSTICAS DO APARELHO" />
-        <p><span className="font-bold">Marca/Modelo:</span> <span className={!data.produtoMarca ? "bg-doc-accent-bg text-doc-accent px-1 font-bold rounded" : ""}>{data.produtoMarca || "MARCA"}</span> {data.produtoModelo ? data.produtoModelo : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">MODELO</span>} &nbsp;&nbsp; <span className="font-bold">Armazenamento:</span> {data.produtoArmazenamento ? data.produtoArmazenamento : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">xxx</span>}GB &nbsp;&nbsp; <span className="font-bold">Nº de série:</span> {data.produtoNumSerie ? data.produtoNumSerie : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">xxxxxxxxxxxx</span>} &nbsp;&nbsp; <span className="font-bold">Acessórios:</span> {data.produtoAcessorios ? data.produtoAcessorios : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">xxxxxxxxx</span>}</p>
+        <p><span className="font-bold">Marca/Modelo:</span> <span className={!data.produtoMarca ? "bg-doc-accent-bg text-doc-accent px-1 font-bold rounded" : ""}>{data.produtoMarca || "MARCA"}</span> {data.produtoModelo ? data.produtoModelo : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">MODELO</span>}</p>
+        <p><span className="font-bold">Capacidade de Armazenamento:</span> {data.produtoArmazenamento ? data.produtoArmazenamento : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">xxx</span>}GB &nbsp;&nbsp; <span className="font-bold">Número de série:</span> {data.produtoNumSerie ? data.produtoNumSerie : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">xxxxxxxxxxxx</span>} &nbsp;&nbsp; <span className="font-bold">Acessórios:</span> {data.produtoAcessorios ? data.produtoAcessorios : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">xxxxxxxxx</span>}</p>
         <Clause title="3. VALOR DA VENDA E FORMA DE PAGAMENTO" />
         <p>3.1 O valor total da venda é de <span className="font-bold underline">{formatCurrency(data.valorTotal)} ({extenso(data.valorTotal)})</span>, a ser pago pelo(a) COMPRADOR(A) em <span className="font-bold">{data.numParcelas} ({extensoSimples(data.numParcelas)})</span> parcelas no valor de <span className="font-bold underline">{formatCurrency(valorParcela)} ({extenso(valorParcela)})</span>, com vencimento todo dia {data.diaVencimento ? data.diaVencimento : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">XX</span>} de cada mês, iniciando em {formatDate(data.dataPrimeiraParcela)}.</p>
         <p>3.2 O pagamento será realizado via <span className="font-bold">BOLETO BANCÁRIO</span>.</p>
-        <p>3.3 Em caso de inadimplência, aplicar-se-á multa de 2% (art. 408, CC), além de juros de mora de 1% ao mês (art. 406, CC c/c art. 161, §1º, CTN).</p>
+        <p>3.3 Em caso de inadimplência, aplicar-se-á multa de 2% (art. 408, Código Civil), além de juros de mora de 1% ao mês (art. 406, Código Civil c/c art. 161, §1º, do CTN).</p>
         <Clause title="4. CAUÇÃO E GARANTIAS" />
         <p>4.1 A caução inicial será utilizada como garantia das obrigações contratuais.</p>
-        <p>4.2 Em caso de inadimplência ou rescisão por culpa do(a) COMPRADOR(A), a caução será retida pela VENDEDORA para cobertura de prejuízos (art. 580, CC).</p>
+        <p>4.2 Em caso de inadimplência ou rescisão contratual por culpa do(a) COMPRADOR(A), a caução será retida pela VENDEDORA para cobertura de prejuízos, nos termos do artigo 580 do Código Civil.</p>
         <Clause title="5. OBRIGAÇÕES DAS PARTES" />
         <p>5.1 Obrigações da VENDEDORA: a) Entregar o aparelho em pleno funcionamento; b) Garantir o procedimento de garantia dentro do prazo de 90 dias.</p>
-        <p>5.2 Obrigações do(a) COMPRADOR(A): a) Utilizar o aparelho exclusivamente para fins lícitos; b) Realizar os pagamentos conforme estipulado; c) Informar imediatamente qualquer dano, furto ou perda.</p>
+        <p>5.2 Obrigações do(a) COMPRADOR(A): a) Utilizar o aparelho exclusivamente para fins lícitos e de acordo com as orientações do fabricante; b) Realizar os pagamentos conforme estipulado neste contrato; c) Informar imediatamente à VENDEDORA qualquer dano, furto ou perda do aparelho.</p>
         <Clause title="6. RESCISÃO CONTRATUAL" />
-        <p>6.1 O contrato poderá ser rescindido por iniciativa da VENDEDORA em caso de descumprimento das obrigações, especialmente o não pagamento das parcelas.</p>
-        <p>6.2 Em caso de rescisão por culpa do(a) COMPRADOR(A): a) A entrada será retida para cobrir danos e prejuízos; b) Multa equivalente a 10% dos valores a serem pagos; c) Devolução imediata do aparelho em perfeito estado.</p>
-        <p>6.3 Caso o aparelho apresente danos, a VENDEDORA realizará orçamento para reparo e deduzirá o valor da entrada.</p>
+        <p>6.1 O contrato poderá ser rescindido por iniciativa da VENDEDORA em caso de descumprimento das obrigações contratuais, especialmente o não pagamento das parcelas.</p>
+        <p>6.2 Em caso de rescisão contratual por culpa do(a) COMPRADOR(A): a) A entrada será retida para cobrir os danos e prejuízos; b) Aplicar-se-á multa equivalente a 10% (dez por cento) dos valores a serem pagos; c) Será exigida a devolução imediata do aparelho em perfeito estado, salvo desgastes naturais.</p>
+        <p>6.3 Caso o aparelho apresente danos, a VENDEDORA realizará orçamento para reparo e deduzirá o valor da entrada. Eventuais custos adicionais deverão ser quitados pelo(a) COMPRADOR(A).</p>
         <Clause title="7. PROPRIEDADE DO APARELHO" />
-        <p>7.1 Durante o período de pagamento das parcelas, o aparelho permanecerá como propriedade exclusiva da VENDEDORA.</p>
+        <p>7.1 Durante o período de pagamento das parcelas da venda, o aparelho permanecerá como propriedade exclusiva da VENDEDORA.</p>
         <Clause title="8. RESPONSABILIDADE POR PERDA OU ROUBO" />
-        <p>8.2 Em caso de perda, roubo ou furto, o(a) COMPRADOR(A) deverá comunicar imediatamente e apresentar boletim de ocorrência em até 48 horas.</p>
-        <p>8.3 O(A) COMPRADOR(A) será o único responsável por indenizar a VENDEDORA pelo valor de mercado atualizado do aparelho.</p>
+        <p>8.2 Em caso de perda, roubo ou furto qualificado do aparelho, o(a) COMPRADOR(A) deverá comunicar o fato imediatamente à VENDEDORA e apresentar o boletim de ocorrência policial em até 48 (quarenta e oito) horas.</p>
+        <p>8.3 O(A) COMPRADOR(A) será o único responsável por indenizar a VENDEDORA pelo valor de mercado atualizado do aparelho ou pelos custos de reposição, conforme aplicável.</p>
         <Clause title="9. CONSERVAÇÃO E USO" />
-        <p>9.1 O(A) COMPRADOR(A) compromete-se a manter o aparelho em perfeito estado de conservação, não o expondo a condições extremas.</p>
-        <p>9.2 Os reparos deverão ser realizados exclusivamente pela VENDEDORA ou por estabelecimento por ela autorizado, sob pena de rescisão imediata.</p>
+        <p>9.1 O(A) COMPRADOR(A) compromete-se a manter o aparelho em perfeito estado de conservação, utilizando-o de maneira responsável. O(A) COMPRADOR(A) não deverá expor o aparelho a condições extremas, como calor, umidade ou impactos, que possam ocasionar danos permanentes.</p>
+        <p>9.2 Os reparos deverão ser realizados exclusivamente pela VENDEDORA ou por estabelecimento autorizado, mediante aprovação prévia, sob pena de rescisão imediata do contrato, sem prejuízo da cobrança das parcelas vincendas e eventuais perdas e danos.</p>
         <Clause title="10. ATUALIZAÇÃO OU TROCA POR OBSOLESCÊNCIA" />
-        <p>10.1 O(A) COMPRADOR(A) poderá solicitar a troca do aparelho por modelo mais recente a qualquer momento durante a vigência do contrato.</p>
-        <p>10.3 A troca sujeita-se ao pagamento de taxa administrativa (valor a definir na loja) e ajuste no valor das parcelas, conforme disponibilidade do modelo solicitado.</p>
+        <p>10.1 O(A) COMPRADOR(A) poderá, a qualquer momento durante a vigência do contrato, solicitar a troca do aparelho por um modelo mais recente ou com especificações superiores.</p>
+        <p>10.2 A troca estará sujeita às condições e valores previstos na tabela de atualização vigente, fornecida pela VENDEDORA.</p>
+        <p>10.3 Para efetuar a troca, o(a) COMPRADOR(A) deverá pagar uma taxa administrativa (valor a definir na loja), além de concordar com o ajuste no valor das parcelas do contrato, caso aplicável. A substituição estará sujeita à disponibilidade do modelo solicitado.</p>
         <Clause title="11. RESOLUÇÃO ANTECIPADA" />
-        <p>11.1 Em caso de rescisão antecipada por iniciativa do(a) COMPRADOR(A): a) Pagamento de multa de 25% do saldo remanescente das parcelas vincendas; b) Restituição do aparelho em perfeito estado.</p>
+        <p>11.1 Em caso de rescisão antecipada do contrato por iniciativa do(a) COMPRADOR(A), este se compromete: a) Efetuar o pagamento de multa contratual equivalente a 25% (vinte e cinco por cento) do saldo remanescente das parcelas ainda não vencidas; b) Restituir o aparelho em perfeito estado de conservação, salvo desgaste natural decorrente do uso regular.</p>
         <Clause title="12. RESPONSABILIDADE SOBRE DADOS" />
-        <p>12.1 A VENDEDORA não assume responsabilidade pela perda ou corrupção de dados armazenados no aparelho. É de responsabilidade exclusiva do(a) COMPRADOR(A) realizar backups antes de devolver o aparelho ou solicitar assistência técnica.</p>
+        <p>12.1 A VENDEDORA não assume qualquer responsabilidade pela perda, exclusão ou corrupção de dados armazenados no aparelho. É de exclusiva responsabilidade do(a) COMPRADOR(A) realizar backups regulares de seus dados antes de: a) Devolver o aparelho à VENDEDORA; b) Solicitar assistência técnica ou substituição do aparelho.</p>
+        <p>12.2 A VENDEDORA recomenda que o(a) COMPRADOR(A) utilize ferramentas seguras de armazenamento de dados para evitar prejuízos.</p>
         <Clause title="13. GARANTIA ADICIONAL" />
-        <p>13.1 O aparelho possui garantia total de 12 meses contra defeitos de fabricação: 9 meses contratual + 90 dias legal (CDC art. 26, II).</p>
-        <p>13.2 A garantia não abrange: a) Danos por mau uso, quedas ou líquidos; b) Reparos por terceiros não autorizados; c) Uso de acessórios não originais.</p>
-        <p>13.3 Para reivindicar a garantia, o(a) COMPRADOR(A) deverá apresentar o aparelho com o contrato e/ou comprovante de venda.</p>
+        <p>13.1 O aparelho possui garantia total de 12 (doze) meses contra defeitos de fabricação, contados a partir da data de recebimento do produto. Este prazo é composto pela garantia contratual de 9 (nove) meses, oferecida pela VENDEDORA, e pela garantia legal de 90 (noventa) dias, conforme o art. 26, II, do Código de Defesa do Consumidor.</p>
+        <p>13.2 A garantia não abrange: a) Danos ocasionados por mau uso, quedas, contato com líquidos ou outros agentes externos; b) Reparos realizados por terceiros não autorizados pela VENDEDORA; c) Defeitos decorrentes do uso de acessórios não originais ou incompatíveis com o aparelho.</p>
+        <p>13.3 Para reivindicar a garantia, o(a) COMPRADOR(A) deverá apresentar o aparelho juntamente com o contrato e/ou comprovante de venda.</p>
         <Clause title="14. PROGRAMA JCV EMPRESTA" />
-        <p>14.1 A VENDEDORA oferece empréstimo de aparelho substituto durante reparos cobertos pela garantia, condicionado à adimplência e disponibilidade de estoque.</p>
-        <p>14.4 A retirada do aparelho substituto será formalizada por Termo de Comodato, comprometendo-se o(a) COMPRADOR(A) a: a) Devolver em até 48h após conclusão do reparo; b) Zelar pela integridade; c) Responsabilizar-se por danos, perdas ou furtos.</p>
+        <p>14.1 Como um benefício adicional, a VENDEDORA institui o Programa JCV Empresta, que consiste no empréstimo de um aparelho substituto ao(à) COMPRADOR(A) caso o produto original necessite de reparos cobertos pela garantia.</p>
+        <p>14.2 A elegibilidade está condicionada a: a) A necessidade de reparo ser coberta pela garantia legal ou contratual; b) A estrita adimplência do(a) COMPRADOR(A); c) A disponibilidade de aparelho compatível no estoque da VENDEDORA.</p>
+        <p>14.3 O aparelho emprestado será de modelo similar, buscando manter funcionalidades equivalentes, não sendo necessariamente idêntico em marca, cor ou especificações.</p>
+        <p>14.4 A retirada será formalizada por Termo de Comodato, comprometendo-se o(a) COMPRADOR(A) a: a) Devolver em até 48 horas após a conclusão do reparo; b) Zelar pela integridade do aparelho; c) Responsabilizar-se por quaisquer danos, perdas, furtos ou roubos durante o período do empréstimo.</p>
         <Clause title="15. CONFIDENCIALIDADE DE INFORMAÇÕES" />
-        <p>17.1 O(A) COMPRADOR(A) compromete-se a não divulgar informações confidenciais contidas no aparelho, especialmente configurações, software ou aplicativos de propriedade da VENDEDORA. Esta obrigação subsiste após a devolução do aparelho.</p>
+        <p>17.1 O(A) COMPRADOR(A) compromete-se a não divulgar ou compartilhar quaisquer informações confidenciais contidas no aparelho, especialmente configurações, software ou aplicativos de propriedade da VENDEDORA. Esta obrigação subsistirá mesmo após a devolução do aparelho ou o término do contrato.</p>
         <Clause title="16. MANUTENÇÃO PREVENTIVA" />
-        <p>19.1 A VENDEDORA poderá solicitar a devolução temporária para manutenção preventiva ou atualizações, sem custos adicionais, fornecendo aparelho substituto conforme Cláusula 14.</p>
+        <p>19.1 A VENDEDORA poderá, a seu critério, solicitar a devolução temporária do aparelho para manutenção preventiva ou atualizações de software, sem custos adicionais para o(a) COMPRADOR(A). Nesses casos, será fornecido um aparelho substituto temporário, conforme Cláusula 14, sujeito à disponibilidade.</p>
         <Clause title="17. FORO DE SOLUÇÃO DE CONFLITOS E ARBITRAGEM" />
-        <p>20.1 Qualquer controvérsia será resolvida preferencialmente por arbitragem na comarca de Araranguá/SC. Na ausência de acordo, as partes elegem o foro da Comarca de Araranguá/SC.</p>
+        <p>20.1 Qualquer controvérsia ou litígio decorrente deste contrato será resolvido preferencialmente por meio de arbitragem, conforme legislação vigente, sendo o tribunal arbitral localizado na comarca de Araranguá/SC.</p>
+        <p>20.2 Na ausência de acordo pela via arbitral, as partes elegem o foro da comarca de Araranguá/SC como único competente para solucionar o conflito.</p>
         <Clause title="18. DISPOSIÇÕES FINAIS" />
-        <p>21.1 Este contrato constitui o acordo completo entre as partes, substituindo qualquer entendimento prévio. 21.2 O(A) COMPRADOR(A) declara ter lido e compreendido todas as cláusulas. 21.3 Entra em vigor na data da assinatura. 21.4 As partes comprometem-se a manter endereço atualizado para notificações.</p>
+        <p>21.1 Este contrato constitui o acordo completo entre as partes e substitui qualquer entendimento prévio, verbal ou escrito. 21.2 O(A) COMPRADOR(A) declara ter lido e compreendido todas as cláusulas, estando plenamente de acordo com seus termos. 21.3 O presente contrato entra em vigor na data de sua assinatura e permanecerá válido até o término do prazo estipulado ou rescisão por quaisquer das partes. 21.4 As partes comprometem-se a manter endereço atualizado para notificações durante a vigência deste contrato.</p>
         <div className="mt-16 space-y-8 pdf-page-break-avoid">
           <div className="text-right italic font-sans text-[11pt]">Araranguá/SC, {formatDate(data.dataContrato)}</div>
           <div className="flex flex-col gap-10">
