@@ -417,6 +417,7 @@ export default function App() {
   // ─── COMPRA E VENDA PREVIEW ──────────────────────────────────────────────────
   const CompraVendaPreview = ({ isPrint = false, refToUse = null }: { isPrint?: boolean; refToUse?: React.RefObject<HTMLDivElement | null> | null }) => {
     const c = data.contratantes[0];
+    const hl = (val: string, placeholder: string) => val ? <>{val}</> : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">{placeholder}</span>;
     return (
     <div ref={refToUse} style={{position:'relative'}} className={`bg-white w-full ${isPrint ? 'max-w-none' : 'max-w-[210mm] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-doc-border'} p-[10mm] md:p-[20mm] text-[11pt] leading-snug text-doc-text font-serif print:shadow-none print:border-none print:p-0 ${isPrint ? '' : 'mx-auto'}`}>
       <WatermarkLogo />
@@ -426,33 +427,55 @@ export default function App() {
         <p className="text-[10pt] font-sans mt-1 text-doc-muted">Nº {data.numeroContrato}</p>
       </div>
       <div className="space-y-2 text-justify">
-        <p>Pelo presente instrumento, de um lado, a empresa <span className="font-bold">MV SHOP LTDA</span>, CNPJ 46.268.723/0001-77, Av. Coronel João Fernandes, nº 439, Sala 06, Centro, Araranguá/SC, representada por <span className="font-bold">JOSÉ MARCELO MATTOS DOS SANTOS</span>, doravante denominada <span className="font-bold">VENDEDORA</span>, e de outro lado, o(a) Sr./Sra. <span className={!c.nome ? 'bg-doc-accent-bg text-doc-accent px-1 font-bold' : 'font-bold'}>{c.nome || 'NOME COMPLETO'}</span>, CPF <span className={!c.cpf ? 'bg-doc-accent-bg text-doc-accent px-1 font-bold' : ''}>{c.cpf || 'xxx.xxx.xxx-xx'}</span>, residente na Rua {c.rua ? c.rua : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">RUA</span>}, nº {c.numero ? c.numero : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">Nº</span>}, Bairro: {c.bairro ? c.bairro : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">BAIRRO</span>} – Cidade: {c.cidade ? c.cidade : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">CIDADE</span>} – Estado: {c.estado ? c.estado : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">UF</span>} – CEP: {c.cep ? c.cep : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">CEP</span>}, doravante denominado(a) <span className="font-bold">COMPRADOR(A)</span>.</p>
+        <p>Pelo presente instrumento particular, de um lado, a empresa <span className="font-bold">MV SHOP LTDA</span>, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº 46.268.723/0001-77, com sede na Avenida Coronel João Fernandes, nº 439, Sala 06, Centro, Araranguá/SC, CEP 88.900-003, neste ato representada por seu Sócio-Administrador, <span className="font-bold">JOSÉ MARCELO MATTOS DOS SANTOS</span>, doravante denominada <span className="font-bold">VENDEDORA</span> e, de outro lado, o(a) Sr./Sra. <span className={!c.nome ? "bg-doc-accent-bg text-doc-accent px-1 font-bold rounded" : "font-bold"}>{c.nome || "NOME COMPLETO"}</span>, inscrito(a) no CPF sob o nº <span className={!c.cpf ? "bg-doc-accent-bg text-doc-accent px-1 font-bold rounded" : ""}>{c.cpf || "xxx.xxx.xxx-xx"}</span>, residente e domiciliado(a) na Rua {c.rua ? c.rua : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">RUA</span>}, nº {c.numero ? c.numero : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">Nº</span>}, Bairro: {c.bairro ? c.bairro : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">BAIRRO</span>} – Cidade: {c.cidade ? c.cidade : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">CIDADE</span>} – Estado: {c.estado ? c.estado : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">UF</span>} – CEP: {c.cep ? c.cep : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">CEP</span>}, doravante denominado(a) <span className="font-bold">COMPRADOR(A)</span>, têm entre si justo e contratado o seguinte, com fundamento nos artigos 565 a 578 do Código Civil Brasileiro e demais disposições legais aplicáveis:</p>
         <Clause title="1. OBJETO DO CONTRATO" />
-        <p>1.1. O objeto é a venda de um aparelho celular fornecido pela VENDEDORA, podendo ser novo ou seminovo, ao(a) COMPRADOR(A).</p>
+        <p>1.1 O presente contrato tem como objeto a venda de um aparelho celular fornecido pela VENDEDORA, podendo ser novo ou seminovo, ao(a) COMPRADOR(A).</p>
         <Clause title="2. CARACTERÍSTICAS DO APARELHO" />
-        <p><span className="font-bold">Marca/Modelo:</span> <span className={!data.produtoMarca ? 'bg-doc-accent-bg text-doc-accent px-1 font-bold' : ''}>{data.produtoMarca || 'MARCA'}</span> {data.produtoModelo ? data.produtoModelo : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">MODELO</span>} &nbsp;&nbsp; <span className="font-bold">Armazenamento:</span> {data.produtoArmazenamento ? data.produtoArmazenamento : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">xxx</span>}GB &nbsp;&nbsp; <span className="font-bold">Nº de série:</span> {data.produtoNumSerie ? data.produtoNumSerie : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">xxxxxxxxxxxx</span>} &nbsp;&nbsp; <span className="font-bold">Acessórios:</span> {data.produtoAcessorios ? data.produtoAcessorios : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">xxxxxxxxx</span>}</p>
+        <p><span className="font-bold">Marca/Modelo:</span> <span className={!data.produtoMarca ? "bg-doc-accent-bg text-doc-accent px-1 font-bold rounded" : ""}>{data.produtoMarca || "MARCA"}</span> {data.produtoModelo ? data.produtoModelo : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">MODELO</span>} &nbsp;&nbsp; <span className="font-bold">Armazenamento:</span> {data.produtoArmazenamento ? data.produtoArmazenamento : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">xxx</span>}GB &nbsp;&nbsp; <span className="font-bold">Nº de série:</span> {data.produtoNumSerie ? data.produtoNumSerie : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">xxxxxxxxxxxx</span>} &nbsp;&nbsp; <span className="font-bold">Acessórios:</span> {data.produtoAcessorios ? data.produtoAcessorios : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">xxxxxxxxx</span>}</p>
         <Clause title="3. VALOR DA VENDA E FORMA DE PAGAMENTO" />
-        <p>3.1. Valor total: <span className="font-bold underline">{formatCurrency(data.valorTotal)} ({extenso(data.valorTotal)})</span>, em <span className="font-bold">{data.numParcelas} ({extensoSimples(data.numParcelas)})</span> parcelas de <span className="font-bold underline">{formatCurrency(valorParcela)} ({extenso(valorParcela)})</span>, vencendo todo dia {data.diaVencimento ? data.diaVencimento : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">XX</span>} de cada mês, iniciando em {formatDate(data.dataPrimeiraParcela)}.</p>
-        <p>3.2. Pagamento via <span className="font-bold">BOLETO BANCÁRIO</span>. 3.3. Inadimplência: multa de 2% + juros de 1% ao mês.</p>
+        <p>3.1 O valor total da venda é de <span className="font-bold underline">{formatCurrency(data.valorTotal)} ({extenso(data.valorTotal)})</span>, a ser pago pelo(a) COMPRADOR(A) em <span className="font-bold">{data.numParcelas} ({extensoSimples(data.numParcelas)})</span> parcelas no valor de <span className="font-bold underline">{formatCurrency(valorParcela)} ({extenso(valorParcela)})</span>, com vencimento todo dia {data.diaVencimento ? data.diaVencimento : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">XX</span>} de cada mês, iniciando em {formatDate(data.dataPrimeiraParcela)}.</p>
+        <p>3.2 O pagamento será realizado via <span className="font-bold">BOLETO BANCÁRIO</span>.</p>
+        <p>3.3 Em caso de inadimplência, aplicar-se-á multa de 2% (art. 408, CC), além de juros de mora de 1% ao mês (art. 406, CC c/c art. 161, §1º, CTN).</p>
         <Clause title="4. CAUÇÃO E GARANTIAS" />
-        <p>4.1. A caução inicial será utilizada como garantia das obrigações. 4.2. Em caso de inadimplência, a caução será retida pela VENDEDORA.</p>
+        <p>4.1 A caução inicial será utilizada como garantia das obrigações contratuais.</p>
+        <p>4.2 Em caso de inadimplência ou rescisão por culpa do(a) COMPRADOR(A), a caução será retida pela VENDEDORA para cobertura de prejuízos (art. 580, CC).</p>
         <Clause title="5. OBRIGAÇÕES DAS PARTES" />
-        <p>5.1. VENDEDORA: entregar o aparelho em pleno funcionamento e garantir procedimento de garantia por 90 dias.</p>
-        <p>5.2. COMPRADOR(A): utilizar o aparelho para fins lícitos; realizar pagamentos; informar dano, furto ou perda.</p>
+        <p>5.1 Obrigações da VENDEDORA: a) Entregar o aparelho em pleno funcionamento; b) Garantir o procedimento de garantia dentro do prazo de 90 dias.</p>
+        <p>5.2 Obrigações do(a) COMPRADOR(A): a) Utilizar o aparelho exclusivamente para fins lícitos; b) Realizar os pagamentos conforme estipulado; c) Informar imediatamente qualquer dano, furto ou perda.</p>
         <Clause title="6. RESCISÃO CONTRATUAL" />
-        <p>6.2. Em caso de rescisão por culpa do(a) COMPRADOR(A): retenção da entrada; multa de 10% dos valores a pagar; devolução imediata do aparelho em perfeito estado.</p>
+        <p>6.1 O contrato poderá ser rescindido por iniciativa da VENDEDORA em caso de descumprimento das obrigações, especialmente o não pagamento das parcelas.</p>
+        <p>6.2 Em caso de rescisão por culpa do(a) COMPRADOR(A): a) A entrada será retida para cobrir danos e prejuízos; b) Multa equivalente a 10% dos valores a serem pagos; c) Devolução imediata do aparelho em perfeito estado.</p>
+        <p>6.3 Caso o aparelho apresente danos, a VENDEDORA realizará orçamento para reparo e deduzirá o valor da entrada.</p>
         <Clause title="7. PROPRIEDADE DO APARELHO" />
-        <p>7.1. Durante o pagamento das parcelas, o aparelho permanece propriedade exclusiva da VENDEDORA.</p>
+        <p>7.1 Durante o período de pagamento das parcelas, o aparelho permanecerá como propriedade exclusiva da VENDEDORA.</p>
         <Clause title="8. RESPONSABILIDADE POR PERDA OU ROUBO" />
-        <p>8.2. Em caso de perda/roubo, o(a) COMPRADOR(A) deve comunicar imediatamente e apresentar boletim de ocorrência em até 48h. 8.3. O(A) COMPRADOR(A) responde pelo valor de mercado atualizado do aparelho.</p>
+        <p>8.2 Em caso de perda, roubo ou furto, o(a) COMPRADOR(A) deverá comunicar imediatamente e apresentar boletim de ocorrência em até 48 horas.</p>
+        <p>8.3 O(A) COMPRADOR(A) será o único responsável por indenizar a VENDEDORA pelo valor de mercado atualizado do aparelho.</p>
         <Clause title="9. CONSERVAÇÃO E USO" />
-        <p>9.1. Manter o aparelho em perfeito estado. 9.2. Reparos apenas pela VENDEDORA ou por estabelecimento por ela autorizado, sob pena de rescisão imediata.</p>
+        <p>9.1 O(A) COMPRADOR(A) compromete-se a manter o aparelho em perfeito estado de conservação, não o expondo a condições extremas.</p>
+        <p>9.2 Os reparos deverão ser realizados exclusivamente pela VENDEDORA ou por estabelecimento por ela autorizado, sob pena de rescisão imediata.</p>
+        <Clause title="10. ATUALIZAÇÃO OU TROCA POR OBSOLESCÊNCIA" />
+        <p>10.1 O(A) COMPRADOR(A) poderá solicitar a troca do aparelho por modelo mais recente a qualquer momento durante a vigência do contrato.</p>
+        <p>10.3 A troca sujeita-se ao pagamento de taxa administrativa (valor a definir na loja) e ajuste no valor das parcelas, conforme disponibilidade do modelo solicitado.</p>
+        <Clause title="11. RESOLUÇÃO ANTECIPADA" />
+        <p>11.1 Em caso de rescisão antecipada por iniciativa do(a) COMPRADOR(A): a) Pagamento de multa de 25% do saldo remanescente das parcelas vincendas; b) Restituição do aparelho em perfeito estado.</p>
+        <Clause title="12. RESPONSABILIDADE SOBRE DADOS" />
+        <p>12.1 A VENDEDORA não assume responsabilidade pela perda ou corrupção de dados armazenados no aparelho. É de responsabilidade exclusiva do(a) COMPRADOR(A) realizar backups antes de devolver o aparelho ou solicitar assistência técnica.</p>
         <Clause title="13. GARANTIA ADICIONAL" />
-        <p>13.1. Garantia total de 12 meses contra defeitos de fabricação: 9 meses contratual + 90 dias legal (CDC art. 26, II).</p>
+        <p>13.1 O aparelho possui garantia total de 12 meses contra defeitos de fabricação: 9 meses contratual + 90 dias legal (CDC art. 26, II).</p>
+        <p>13.2 A garantia não abrange: a) Danos por mau uso, quedas ou líquidos; b) Reparos por terceiros não autorizados; c) Uso de acessórios não originais.</p>
+        <p>13.3 Para reivindicar a garantia, o(a) COMPRADOR(A) deverá apresentar o aparelho com o contrato e/ou comprovante de venda.</p>
         <Clause title="14. PROGRAMA JCV EMPRESTA" />
-        <p>14.1. Empréstimo de aparelho substituto durante reparos cobertos pela garantia, condicionado à adimplência e disponibilidade de estoque.</p>
-        <Clause title="17. FORO DE SOLUÇÃO DE CONFLITOS" />
-        <p>20.1. Foro da comarca de Araranguá/SC.</p>
+        <p>14.1 A VENDEDORA oferece empréstimo de aparelho substituto durante reparos cobertos pela garantia, condicionado à adimplência e disponibilidade de estoque.</p>
+        <p>14.4 A retirada do aparelho substituto será formalizada por Termo de Comodato, comprometendo-se o(a) COMPRADOR(A) a: a) Devolver em até 48h após conclusão do reparo; b) Zelar pela integridade; c) Responsabilizar-se por danos, perdas ou furtos.</p>
+        <Clause title="15. CONFIDENCIALIDADE DE INFORMAÇÕES" />
+        <p>17.1 O(A) COMPRADOR(A) compromete-se a não divulgar informações confidenciais contidas no aparelho, especialmente configurações, software ou aplicativos de propriedade da VENDEDORA. Esta obrigação subsiste após a devolução do aparelho.</p>
+        <Clause title="16. MANUTENÇÃO PREVENTIVA" />
+        <p>19.1 A VENDEDORA poderá solicitar a devolução temporária para manutenção preventiva ou atualizações, sem custos adicionais, fornecendo aparelho substituto conforme Cláusula 14.</p>
+        <Clause title="17. FORO DE SOLUÇÃO DE CONFLITOS E ARBITRAGEM" />
+        <p>20.1 Qualquer controvérsia será resolvida preferencialmente por arbitragem na comarca de Araranguá/SC. Na ausência de acordo, as partes elegem o foro da Comarca de Araranguá/SC.</p>
+        <Clause title="18. DISPOSIÇÕES FINAIS" />
+        <p>21.1 Este contrato constitui o acordo completo entre as partes, substituindo qualquer entendimento prévio. 21.2 O(A) COMPRADOR(A) declara ter lido e compreendido todas as cláusulas. 21.3 Entra em vigor na data da assinatura. 21.4 As partes comprometem-se a manter endereço atualizado para notificações.</p>
         <div className="mt-16 space-y-8 pdf-page-break-avoid">
           <div className="text-right italic font-sans text-[11pt]">Araranguá/SC, {formatDate(data.dataContrato)}</div>
           <div className="flex flex-col gap-10">
@@ -466,7 +489,7 @@ export default function App() {
     );
   };
 
-  // ─── EMBAIXADORES PREVIEW ────────────────────────────────────────────────────
+    // ─── EMBAIXADORES PREVIEW ────────────────────────────────────────────────────
   const EmbaixadoresPreview = ({ isPrint = false, refToUse = null }: { isPrint?: boolean; refToUse?: React.RefObject<HTMLDivElement | null> | null }) => {
     const c = data.contratantes[0];
     return (
@@ -478,29 +501,37 @@ export default function App() {
         <p className="text-[10pt] font-sans mt-1 text-doc-muted">Nº {data.numeroContrato}</p>
       </div>
       <div className="space-y-2 text-justify">
-        <p><span className="font-bold">CONTRATANTE: MV SHOP LTDA</span>, CNPJ 46.268.723/0001-77, Av. Coronel João Fernandes, nº 439, Sala 06, Centro, Araranguá/SC, representada por <span className="font-bold">JOSÉ MARCELO MATTOS DOS SANTOS</span>.</p>
-        <p><span className="font-bold">CONTRATADO(A) / EMBAIXADOR(A): <span className={!c.nome ? 'bg-doc-accent-bg text-doc-accent px-1' : ''}>{c.nome || 'NOME COMPLETO'}</span></span>, CPF <span className={!c.cpf ? 'bg-doc-accent-bg text-doc-accent px-1' : ''}>{c.cpf || 'xxx.xxx.xxx-xx'}</span>, residente na Rua {c.rua ? c.rua : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">RUA</span>}, nº {c.numero ? c.numero : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">Nº</span>}, Bairro: {c.bairro ? c.bairro : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">BAIRRO</span>}, Cidade: {c.cidade ? c.cidade : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">CIDADE</span>}/{c.estado ? c.estado : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">UF</span>}, CEP: {c.cep ? c.cep : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">CEP</span>}.</p>
-        <Clause title="CLÁUSULA PRIMEIRA — DO OBJETO E DA ADESÃO VOLUNTÁRIA" />
-        <p>1.1. Adesão voluntária ao Programa de Embaixadores da MV SHOP: prestação de serviços de marketing digital em troca de condições comerciais especiais para aquisição do produto <span className="font-bold">{data.produtoEmbaixador ? data.produtoEmbaixador : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">PRODUTO</span>}</span>.</p>
-        <p>1.2. Este instrumento é acessório ao <span className="font-bold">Contrato de Compra e Venda nº {data.numeroContrato}</span>.</p>
-        <Clause title="CLÁUSULA SEGUNDA — DA VINCULAÇÃO CONTRATUAL" />
-        <p>2.1. Os contratos são coligados e interdependentes. Descumprimento de qualquer cláusula equivale a inadimplemento da operação como um todo.</p>
-        <Clause title="CLÁUSULA TERCEIRA — DAS OBRIGAÇÕES DO(A) EMBAIXADOR(A)" />
-        <p>3.1. Mensalmente, o(a) EMBAIXADOR(A) obriga-se a, no perfil @{data.instagramEmbaixador ? data.instagramEmbaixador : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">@INSTAGRAM</span>}:</p>
-        <p className="pl-6">a) <span className="font-bold">Feed:</span> {data.pubsFeed} publicação(ões) por mês com o produto, marcando {data.instagramLoja}.</p>
-        <p className="pl-6">b) <span className="font-bold">Stories:</span> {data.pubsStories} sequência(s) por mês com no mínimo 3 telas cada, marcando a loja.</p>
-        <p>3.3. Todo conteúdo deve ser aprovado pela MV SHOP com 48h de antecedência. 3.4. Publicações devem conter <span className="font-bold">#publicidade</span> ou <span className="font-bold">#publi</span> (CONAR).</p>
-        <Clause title="CLÁUSULA QUARTA — DA CONTRAPARTIDA" />
-        <p>4.1. Como contrapartida, o(a) EMBAIXADOR(A) obtém o benefício de adquirir o produto em formato parcelado conforme o Contrato de Compra e Venda vinculado.</p>
-        <Clause title="CLÁUSULA QUINTA — DO INADIMPLEMENTO" />
-        <p>5.2. O descumprimento das obrigações de divulgação equivale ao inadimplemento das parcelas, autorizando rescisão imediata de ambos os contratos e devolução do aparelho.</p>
-        <Clause title="CLÁUSULA SEXTA — DO USO DE IMAGEM" />
-        <p>6.1. O(A) EMBAIXADOR(A) autoriza uso de imagem, nome, voz e conteúdo produzido conforme o Anexo I.</p>
-        <Clause title="CLÁUSULA SÉTIMA — DA VIGÊNCIA" />
-        <p>7.1. Vigência atrelada ao Contrato de Compra e Venda, encerrando-se com a quitação integral e cumprimento de todas as obrigações de divulgação.</p>
-        <Clause title="CLÁUSULA OITAVA — DISPOSIÇÕES GERAIS" />
-        <p>8.1. Inexiste vínculo empregatício. 8.3. Foro da comarca de Araranguá/SC.</p>
-        <div className="mt-16 space-y-8 pdf-page-break-avoid">
+        <div className="bg-doc-section-bg py-1 border-y border-doc-divider font-bold text-center uppercase tracking-tight text-[10pt] font-sans text-doc-text">IDENTIFICAÇÃO DAS PARTES</div>
+        <p><span className="font-bold">CONTRATANTE: MV SHOP LTDA</span>, pessoa jurídica de direito privado, CNPJ 46.268.723/0001-77, Avenida Coronel João Fernandes, nº 439, Sala 06, Centro, Araranguá/SC, CEP 88.900-003, representada por <span className="font-bold">JOSÉ MARCELO MATTOS DOS SANTOS</span>, doravante denominada <span className="font-bold">MV SHOP</span>.</p>
+        <p><span className="font-bold">CONTRATADO(A) / EMBAIXADOR(A): <span className={!c.nome ? "bg-doc-accent-bg text-doc-accent px-1 font-bold rounded" : ""}>{c.nome || "NOME COMPLETO"}</span></span>, CPF <span className={!c.cpf ? "bg-doc-accent-bg text-doc-accent px-1 font-bold rounded" : ""}>{c.cpf || "xxx.xxx.xxx-xx"}</span>, residente na Rua {c.rua ? c.rua : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">RUA</span>}, nº {c.numero ? c.numero : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">Nº</span>}, Bairro: {c.bairro ? c.bairro : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">BAIRRO</span>} – Cidade: {c.cidade ? c.cidade : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">CIDADE</span>} – Estado: {c.estado ? c.estado : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">UF</span>} – CEP: {c.cep ? c.cep : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">CEP</span>}, doravante denominado(a) <span className="font-bold">EMBAIXADOR(A)</span>.</p>
+        <p>As partes celebram o presente Contrato de Adesão, que se regerá pelas seguintes cláusulas:</p>
+        <Clause title="CLÁUSULA PRIMEIRA – DO OBJETO E DA ADESÃO VOLUNTÁRIA" />
+        <p>1.1. O objeto deste contrato é a adesão voluntária do(a) EMBAIXADOR(A) ao Programa de Embaixadores da MV SHOP, que consiste na prestação de serviços de marketing digital e divulgação da marca em troca de acesso a condições comerciais especiais para a aquisição de produtos.</p>
+        <p>1.2. O(A) EMBAIXADOR(A) declara que adere ao presente programa de livre e espontânea vontade, ciente de que a MV SHOP também disponibiliza a venda do mesmo produto em condições padrão, sem necessidade de contrapartida de divulgação.</p>
+        <p>1.3. Declara, ainda, que optou por este modelo para usufruir do benefício de compra parcelada, reconhecendo que as obrigações de divulgação são uma contrapartida justa e proporcional ao benefício recebido.</p>
+        <Clause title="CLÁUSULA SEGUNDA – DA VINCULAÇÃO CONTRATUAL" />
+        <p>2.1. Este instrumento é acessório e vinculado ao Contrato de Compra e Venda nº <span className="font-bold">{data.numeroContrato}</span>, referente à aquisição do produto <span className={!data.produtoEmbaixador ? "bg-doc-accent-bg text-doc-accent px-1 font-bold rounded" : "font-bold"}>{data.produtoEmbaixador || "PRODUTO"}</span>.</p>
+        <p>2.2. As obrigações de ambos os contratos são coligadas e interdependentes. O descumprimento de qualquer cláusula será considerado inadimplemento da operação como um todo.</p>
+        <Clause title="CLÁUSULA TERCEIRA – DAS OBRIGAÇÕES DO(A) EMBAIXADOR(A)" />
+        <p>3.1. O(A) EMBAIXADOR(A) obriga-se a, mensalmente, realizar as seguintes ações de divulgação em seu perfil no Instagram (<span className={!data.instagramEmbaixador ? "bg-doc-accent-bg text-doc-accent px-1 font-bold rounded" : "font-bold"}>{data.instagramEmbaixador ? "@" + data.instagramEmbaixador.replace("@","") : "@INSTAGRAM"}</span>):</p>
+        <p className="pl-6">a) <span className="font-bold">Publicações no Feed:</span> Produzir e publicar <span className="font-bold">{data.pubsFeed}</span> foto(s) ou vídeo(s) por mês, utilizando o produto e marcando o perfil oficial da MV SHOP (<span className={!data.instagramLoja ? "bg-doc-accent-bg text-doc-accent px-1 font-bold rounded" : "font-bold"}>{data.instagramLoja || "@LOJA"}</span>) na imagem e na legenda.</p>
+        <p className="pl-6">b) <span className="font-bold">Publicações nos Stories:</span> Produzir e publicar <span className="font-bold">{data.pubsStories}</span> sequência(s) de stories por mês, com no mínimo 3 (três) telas cada, mostrando o uso do produto ou a experiência com a MV SHOP, sempre marcando o perfil da loja.</p>
+        <p>3.2. As publicações no feed deverão ser mantidas no perfil, sem arquivamento ou exclusão, durante toda a vigência deste contrato.</p>
+        <p>3.3. Todo conteúdo produzido deverá ser submetido à aprovação prévia da MV SHOP com antecedência mínima de 48 horas antes da publicação.</p>
+        <p>3.4. Todas as publicações deverão conter, de forma clara e visível, a identificação de seu caráter publicitário, por meio das hashtags <span className="font-bold">#publicidade</span> ou <span className="font-bold">#publi</span>, em conformidade com as diretrizes do CONAR.</p>
+        <Clause title="CLÁUSULA QUARTA – DA CONTRAPARTIDA (BENEFÍCIO)" />
+        <p>4.1. Como contrapartida pelos serviços de divulgação, o(a) EMBAIXADOR(A) obtém o benefício de adquirir o produto em formato parcelado, conforme detalhado no Contrato de Compra e Venda vinculado.</p>
+        <Clause title="CLÁUSULA QUINTA – DO INADIMPLEMENTO" />
+        <p>5.1. O descumprimento de qualquer obrigação de divulgação prevista na Cláusula Terceira será considerado quebra contratual.</p>
+        <p>5.2. A quebra contratual equipara-se ao inadimplemento das parcelas do Contrato de Compra e Venda, autorizando a MV SHOP a declarar a rescisão imediata de ambos os contratos e exigir a devolução do aparelho, sem prejuízo das multas previstas no contrato principal.</p>
+        <Clause title="CLÁUSULA SEXTA – DO USO DE IMAGEM" />
+        <p>6.1. O(A) EMBAIXADOR(A) autoriza o uso de sua imagem, nome, voz e conteúdo produzido conforme os termos do Anexo I – Termo de Autorização de Uso de Imagem e Voz, parte integrante deste contrato.</p>
+        <Clause title="CLÁUSULA SÉTIMA – DA VIGÊNCIA" />
+        <p>7.1. A vigência deste contrato está atrelada à do Contrato de Compra e Venda, encerrando-se automaticamente com a quitação integral e o cumprimento de todas as obrigações de divulgação.</p>
+        <Clause title="CLÁUSULA OITAVA – DISPOSIÇÕES GERAIS" />
+        <p>8.1. Este contrato não estabelece qualquer vínculo empregatício entre as partes. 8.2. As partes comprometem-se a manter em sigilo todas as informações confidenciais. 8.3. Foro da comarca de Araranguá/SC.</p>
+        <p className="text-center italic mt-4">E, por estarem justas e contratadas, assinam o presente instrumento.</p>
+        <div className="mt-12 space-y-8 pdf-page-break-avoid">
           <div className="text-right italic font-sans text-[11pt]">Araranguá/SC, {formatDate(data.dataContrato)}</div>
           <div className="flex flex-col gap-10">
             <SignatureBlock label="CONTRATANTE — MV SHOP LTDA" />
@@ -513,7 +544,7 @@ export default function App() {
     );
   };
 
-  // ─── IMAGEM PREVIEW ──────────────────────────────────────────────────────────
+    // ─── IMAGEM PREVIEW ──────────────────────────────────────────────────────────
   const ImagemPreview = ({ isPrint = false, refToUse = null }: { isPrint?: boolean; refToUse?: React.RefObject<HTMLDivElement | null> | null }) => {
     const c = data.contratantes[0];
     return (
@@ -521,28 +552,34 @@ export default function App() {
       <WatermarkLogo />
       <ContractHeader />
       <div className="text-center font-bold mb-4 uppercase">
-        <h1 className="text-[12pt] underline underline-offset-4 decoration-doc-divider">ANEXO I — TERMO DE AUTORIZAÇÃO DE USO DE IMAGEM E VOZ</h1>
-        <p className="text-[10pt] font-sans mt-1 text-doc-muted">Ref. Contrato Nº {data.numeroContrato}</p>
+        <h1 className="text-[12pt] underline underline-offset-4 decoration-doc-divider">ANEXO I – TERMO DE AUTORIZAÇÃO DE USO DE IMAGEM E VOZ</h1>
+        <p className="text-[10pt] font-sans mt-1 normal-case text-doc-muted">Parte integrante do Contrato de Adesão ao Programa de Embaixadores MV SHOP — Nº {data.numeroContrato}</p>
       </div>
       <div className="space-y-2 text-justify">
-        <p>Este termo é parte integrante do Contrato de Adesão ao Programa de Embaixadores MV SHOP, firmado em {formatDate(data.dataContrato)}.</p>
-        <p><span className="font-bold">CEDENTE / EMBAIXADOR(A): <span className={!c.nome ? 'bg-doc-accent-bg text-doc-accent px-1' : ''}>{c.nome || 'NOME COMPLETO'}</span></span>, CPF <span className={!c.cpf ? 'bg-doc-accent-bg text-doc-accent px-1' : ''}>{c.cpf || 'xxx.xxx.xxx-xx'}</span>, residente na Rua {c.rua ? c.rua : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">RUA</span>}, nº {c.numero ? c.numero : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">Nº</span>}, {c.bairro ? c.bairro : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">BAIRRO</span>}, {c.cidade ? c.cidade : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">CIDADE</span>}/{c.estado ? c.estado : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">UF</span>}, CEP {c.cep ? c.cep : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">CEP</span>}.</p>
-        <p><span className="font-bold">CESSIONÁRIA: MV SHOP LTDA</span>, CNPJ 46.268.723/0001-77, Av. Coronel João Fernandes, nº 439, Sala 06, Centro, Araranguá/SC.</p>
-        <Clause title="CLÁUSULA PRIMEIRA — DO OBJETO DA AUTORIZAÇÃO" />
-        <p>1.1. O(A) EMBAIXADOR(A) autoriza a MV SHOP, de forma expressa, irrevogável e irretratável, a captar, fixar, reproduzir, publicar, distribuir, editar e utilizar o conteúdo produzido durante a parceria, contendo sua imagem, nome e voz.</p>
-        <Clause title="CLÁUSULA SEGUNDA — DA FINALIDADE" />
-        <p>2.1. Para fins comerciais, institucionais, publicitários e de marketing da MV SHOP.</p>
-        <Clause title="CLÁUSULA TERCEIRA — DAS MÍDIAS DE VEICULAÇÃO" />
-        <p>3.1. Quaisquer mídias, sem limitação: digitais (redes sociais, site, e-mail marketing, anúncios pagos), impressas (flyers, catálogos) e internas (apresentações comerciais).</p>
-        <Clause title="CLÁUSULA QUARTA — DO TERRITÓRIO" />
-        <p>4.1. Válida para todo o território nacional e internacional.</p>
-        <Clause title="CLÁUSULA QUINTA — DO PRAZO" />
-        <p>5.1. Prazo indeterminado, permanecendo válida mesmo após o término do Contrato de Adesão.</p>
-        <Clause title="CLÁUSULA SEXTA — DA GRATUIDADE" />
-        <p>6.1. Autorização a título gratuito — a contrapartida já está contemplada nos benefícios comerciais da aquisição do produto vinculado.</p>
-        <Clause title="CLÁUSULA SÉTIMA — DISPOSIÇÕES GERAIS" />
-        <p>7.1. O(A) EMBAIXADOR(A) declara ser titular dos direitos autorais sobre o conteúdo produzido e responsabiliza-se por eventuais reivindicações de terceiros. 7.2. A MV SHOP utilizará o material sem ferir a honra ou reputação do(a) EMBAIXADOR(A).</p>
-        <div className="mt-16 space-y-8 pdf-page-break-avoid">
+        <p><span className="font-bold">CEDENTE / EMBAIXADOR(A): <span className={!c.nome ? "bg-doc-accent-bg text-doc-accent px-1 font-bold rounded" : ""}>{c.nome || "NOME COMPLETO"}</span></span>, CPF <span className={!c.cpf ? "bg-doc-accent-bg text-doc-accent px-1 font-bold rounded" : ""}>{c.cpf || "xxx.xxx.xxx-xx"}</span>, residente na Rua {c.rua ? c.rua : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">RUA</span>}, nº {c.numero ? c.numero : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">Nº</span>}, Bairro: {c.bairro ? c.bairro : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">BAIRRO</span>} – Cidade: {c.cidade ? c.cidade : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">CIDADE</span>} – Estado: {c.estado ? c.estado : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">UF</span>} – CEP: {c.cep ? c.cep : <span className="bg-doc-accent-bg text-doc-accent px-1 font-bold rounded">CEP</span>}, doravante denominado(a) <span className="font-bold">EMBAIXADOR(A)</span>.</p>
+        <p><span className="font-bold">CESSIONÁRIA: MV SHOP LTDA</span>, CNPJ 46.268.723/0001-77, Avenida Coronel João Fernandes, nº 439, Sala 06, Centro, Araranguá/SC, CEP 88.900-003, doravante denominada <span className="font-bold">MV SHOP</span>.</p>
+        <p>Pelo presente instrumento, o(a) EMBAIXADOR(A) autoriza a MV SHOP a utilizar sua imagem, nome, voz e as obras intelectuais por ele(a) criadas (incluindo fotografias, vídeos, textos e fonogramas) no âmbito do Contrato de Adesão supracitado, nos seguintes termos:</p>
+        <Clause title="CLÁUSULA PRIMEIRA – DO OBJETO DA AUTORIZAÇÃO" />
+        <p>1.1. O(A) EMBAIXADOR(A) autoriza a MV SHOP, de forma expressa, irrevogável e irretratável, a captar, fixar, reproduzir, publicar, distribuir, editar e utilizar o conteúdo produzido durante a parceria, que pode conter sua imagem, nome e voz.</p>
+        <Clause title="CLÁUSULA SEGUNDA – DA FINALIDADE" />
+        <p>2.1. A presente autorização destina-se ao uso do material para fins comerciais, institucionais, publicitários e de marketing, visando promover a marca, os produtos e os serviços da MV SHOP.</p>
+        <Clause title="CLÁUSULA TERCEIRA – DAS MÍDIAS DE VEICULAÇÃO" />
+        <p>3.1. A utilização poderá ocorrer em quaisquer mídias, sem limitação de inserções ou reproduções, incluindo:</p>
+        <p className="pl-6">a) <span className="font-bold">Mídias Digitais:</span> Redes sociais (Instagram, Facebook, TikTok etc.), site oficial, blog, e-mail marketing, aplicativos de mensagens e plataformas de anúncios pagos (Google Ads, Meta Ads etc.).</p>
+        <p className="pl-6">b) <span className="font-bold">Mídias Impressas:</span> Flyers, cartazes, catálogos, jornais e revistas.</p>
+        <p className="pl-6">c) <span className="font-bold">Mídias Internas:</span> Apresentações comerciais, portfólios e materiais de treinamento.</p>
+        <p className="pl-6">d) Quaisquer outras mídias, existentes ou que venham a ser criadas.</p>
+        <Clause title="CLÁUSULA QUARTA – DO TERRITÓRIO" />
+        <p>4.1. A presente autorização é válida para veiculação em todo o território nacional e internacional.</p>
+        <Clause title="CLÁUSULA QUINTA – DO PRAZO" />
+        <p>5.1. A presente cessão é concedida por prazo indeterminado, permanecendo válida mesmo após o término ou a rescisão do Contrato de Adesão, para que a MV SHOP não seja obrigada a remover materiais de campanhas já veiculadas.</p>
+        <Clause title="CLÁUSULA SEXTA – DA GRATUIDADE" />
+        <p>6.1. A presente autorização é concedida a título gratuito, não havendo qualquer valor a ser pago a título de direitos de imagem ou autorais, uma vez que a contrapartida já está integralmente contemplada nos benefícios comerciais especiais obtidos na aquisição do produto vinculado.</p>
+        <Clause title="CLÁUSULA SÉTIMA – DAS DISPOSIÇÕES GERAIS" />
+        <p>7.1. O(A) EMBAIXADOR(A) declara ser o único titular dos direitos autorais sobre o conteúdo que produzir, garantindo que o material não viola direitos de terceiros, assumindo total responsabilidade por eventuais reivindicações.</p>
+        <p>7.2. A MV SHOP compromete-se a utilizar o material de forma a não ferir a honra, a boa fama ou a respeitabilidade do(a) EMBAIXADOR(A).</p>
+        <p className="text-center italic mt-4">E, por estarem de acordo, assinam o presente termo em 2 (duas) vias de igual teor e forma.</p>
+        <div className="mt-12 space-y-8 pdf-page-break-avoid">
           <div className="text-right italic font-sans text-[11pt]">Araranguá/SC, {formatDate(data.dataContrato)}</div>
           <div className="flex flex-col gap-10">
             <SignatureBlock label="EMBAIXADOR(A) / CEDENTE" nome={c.nome} cpf={c.cpf} />
@@ -554,7 +591,7 @@ export default function App() {
     );
   };
 
-  // ─── Active Preview ──────────────────────────────────────────────────────────
+    // ─── Active Preview ──────────────────────────────────────────────────────────
   const ActivePreview = ({ isPrint = false, refToUse = null }: { isPrint?: boolean; refToUse?: React.RefObject<HTMLDivElement | null> | null }) => {
     if (data.contractType === 'mentoria') return <MentoriaPreview isPrint={isPrint} refToUse={refToUse} />;
     if (data.contractType === 'compravenda') return <CompraVendaPreview isPrint={isPrint} refToUse={refToUse} />;
