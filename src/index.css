@@ -15,18 +15,42 @@
     margin: 15mm;
     size: A4;
   }
+
   body {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+    counter-reset: page;
   }
+
+  body * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
   .print\:hidden {
     display: none !important;
   }
+
   .hidden.print\:block {
     display: block !important;
+  }
+
+  .print-page-number::after {
+    counter-increment: page;
+    content: "Pág. " counter(page);
   }
 }
 
 .pdf-page-break-avoid {
   page-break-inside: avoid;
+}
+
+/* Remove number input spinners */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
 }
